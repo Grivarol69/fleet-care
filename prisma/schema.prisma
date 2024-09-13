@@ -1,0 +1,174 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "postgresql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+enum Mant_Type {
+  PREVENTIVO
+  CORRECTIVO
+  INSPECCION
+}
+
+enum Status {
+  ACTIVE
+  INACTIVE
+}
+
+enum Engine {
+  GASOLINA
+  DIESEL
+  ACPM
+  GNV
+  ELECTRICO
+}
+
+model Category_Items {
+  id          Int          @id @default(autoincrement())
+  userId      String
+  description String       @db.Text
+  status      Status       @default(ACTIVE)
+  items_mants Mant_Items[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Mant_Items {
+  id          Int       @id @default(autoincrement())
+  description String    @db.Text
+  mant_type   Mant_Type
+  idCategory  Int
+
+  category_items Category_Items @relation(fields: [idCategory], references: [id], onDelete: Cascade)
+
+  items_routine Items_Routine[]
+
+  @@index([idCategory])
+}
+
+model Mant_Routines {
+  id            Int             @id @default(autoincrement())
+  description   String          @db.Text
+  km_activate   Int
+  items_routine Items_Routine[]
+}
+
+model Items_Routine {
+  id        Int @id @default(autoincrement())
+  routineId Int
+  itemId    Int
+
+  mant_items    Mant_Items    @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  mant_routines Mant_Routines @relation(fields: [routineId], references: [id], onDelete: Cascade)
+
+  @@index([itemId])
+  @@index([routineId])
+}
+
+model Mant_Plan {
+  id          Int    @id @default(autoincrement())
+  description String @db.Text
+  vehicleId   Int
+}
+
+model Items_Plan {
+  id Int @id @default(autoincrement())
+}
+
+model Vehicle_Brand {
+  id       Int       @id @default(autoincrement())
+  userId   String
+  name     String    @db.Text
+  status   Status    @default(ACTIVE)
+  vehicles Vehicle[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Vehicle_Line {
+  id       Int       @id @default(autoincrement())
+  userId   String
+  name     String    @db.Text
+  status   Status    @default(ACTIVE)
+  vehicles Vehicle[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Vehicle_Type {
+  id       Int       @id @default(autoincrement())
+  userId   String
+  name     String    @db.Text
+  status   Status    @default(ACTIVE)
+  vehicles Vehicle[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Vehicle {
+  id      Int    @id @default(autoincrement())
+  brandId Int
+  lineId  Int
+  typeId  Int
+  year    Int
+  engine  Engine
+
+  brand Vehicle_Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  line  Vehicle_Line  @relation(fields: [lineId], references: [id], onDelete: Cascade)
+  type  Vehicle_Type  @relation(fields: [typeId], references: [id], onDelete: Cascade)
+
+  @@index([brandId])
+  @@index([lineId])
+  @@index([typeId])
+}
+
+model Car {
+  id           String   @id @default(uuid())
+  userId       String
+  name         String   @db.Text
+  cv           String   @db.Text
+  transmission String   @db.Text
+  people       String   @db.Text
+  photo        String   @db.Text
+  priceDay     String   @db.Text
+  engine       String   @db.Text
+  type         String   @db.Text
+  isPublish    Boolean?
+
+  orders    Order[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Order {
+  id           String   @id @default(uuid())
+  carId        String   @db.Text
+  carName      String   @db.Text
+  userId       String   @db.Text
+  orderDate    DateTime @default(now())
+  orderEndDate DateTime @default(now())
+  status       String   @db.Text
+  totalAmount  String   @db.Text
+
+  car Car @relation(fields: [carId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([carId])
+  @@index([userId])
+}

@@ -1,0 +1,43 @@
+# Estructura de carpetas
+
+- (auth)
+  - sign-in // Ruta: http://localhost:3000/sign-in
+  - sign-up // Ruta: http://localhost:3000/sign-up
+- (routes)
+  - (dashboard)
+    - dashboard
+      - admin
+        - cars-manager
+          - page.tsx // Ruta: http://localhost:3000/dashboard/admin/cars-manager
+          - layout.tsx **LayoutAdminCarsManager**
+          - components
+            - ButtonAddCar
+              - Funcionalidad Dialog
+            - FormAddCar
+              - FormAddCar.tsx **formulario**
+              - FormAddCar.form.ts **data validada con Zod**
+            - ListCars **Listado de Coches**
+              - ListCars.types.ts
+              - ListCars.jsx
+            - TableCars
+              - TableCars.types.ts
+              - TableCars.tsx
+      - components
+        - Sidebar
+          - Sidebar.tsx
+        - LogoDashboard
+          - LogoDashboard.tsx
+        - NavbarDashboard
+          - NavbarDashboard.tsx
+        - SidebarRoutes
+          - SidebarRoutes.data.ts **contiene los items del menu de la sidebar**
+          - SidebarRoutes.tsx **contenedor de items**
+            - SidebarItem
+              - SidebarItem.tsx
+              - SidebarItem.types.ts **contiene los tipos de la Props**
+      - page.tsx - **DashboardPage**
+    - DashboardLayout - aca se define el **sidebar** y el **navbar**
+  - (home)
+  - page.tsx \*\*Página Principal
+- api
+  - car **/api/car Endpoint donde se envia la data obtenida en el form para que guarde en la DB**
