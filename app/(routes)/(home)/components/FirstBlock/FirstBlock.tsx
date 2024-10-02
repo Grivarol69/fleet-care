@@ -10,16 +10,16 @@ export function FirstBlock() {
           Fleet-Care
           <span className="block">Software de</span> Mantenimiento
         </h1>
-        <p className="text-lg mt-2 lg:mt-5 lg:text-xl max-w-sm">
+        <p className="text-lg mt-2 lg:mt-4 lg:text-xl max-w-sm">
           Software de mantenimiento de la flota vehicular de tu empresa
         </p>
       </Reveal>
       <Reveal className="flex justify-evenly" position="right">
         <Image
-          src="/images/frangers.jpg"
+          src="/images/frangers-1.png"
           alt="Rent Cars"
-          width={600}
-          height={600}
+          width={800}
+          height={800}
           priority
         />
       </Reveal>

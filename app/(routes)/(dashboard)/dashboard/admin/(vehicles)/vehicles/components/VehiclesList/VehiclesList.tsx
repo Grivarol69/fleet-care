@@ -4,8 +4,13 @@ import { useState, useEffect, useMemo, forwardRef } from "react";
 import {
   useReactTable,
   getCoreRowModel,
+  ColumnFiltersState,
   flexRender,
   ColumnDef,
+  getPaginationRowModel,
+  getFilteredRowModel,
+  getSortedRowModel,
+  SortingState,
 } from "@tanstack/react-table";
 import {
   Table,
@@ -23,6 +28,9 @@ import axios from "axios";
 import { useToast } from "@/components/hooks/use-toast";
 import { VehicleListProps } from "./VehiclesList.types";
 import Image from "next/image";
+import { DownloadBtn } from "./DownloadBtn";
+import { Input } from "@/components/ui/input";
+import { ArrowUpDown } from "lucide-react";
 
 export function VehicleList() {
   const [data, setData] = useState<VehicleListProps[]>([]);
@@ -31,6 +39,10 @@ export function VehicleList() {
   const [editingVehicle, setEditingVehicle] = useState<VehicleListProps | null>(
     null
   );
+  const [globalFilter, setGlobalFilter] = useState("");
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [sorting, setSorting] = useState<SortingState>([]);
+
   const { toast } = useToast();
 
   const fetchVehicles = async () => {
@@ -90,8 +102,38 @@ export function VehicleList() {
           />
         ),
       },
-      { accessorKey: "licensePlate", header: "Placa" },
-      { accessorKey: "brandName", header: "Marca" },
+      {
+        accessorKey: "licensePlate",
+        header: ({ column }) => {
+          return (
+            <Button
+              variant="ghost"
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
+            >
+              Placa
+              <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+          );
+        },
+      },
+      {
+        accessorKey: "brandName",
+        header: ({ column }) => {
+          return (
+            <Button
+              variant="ghost"
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
+            >
+              Marca
+              <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+          );
+        },
+      },
       { accessorKey: "lineName", header: "Linea" },
       { accessorKey: "typeName", header: "Tipo" },
       { accessorKey: "typePlate", header: "Tipo Placa" },
@@ -127,15 +169,43 @@ export function VehicleList() {
   const table = useReactTable({
     data,
     columns,
+    getFilteredRowModel: getFilteredRowModel(),
     getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    onColumnFiltersChange: setColumnFilters,
+    getSortedRowModel: getSortedRowModel(),
+    state: {
+      sorting,
+      columnFilters,
+    },
+    onSortingChange: setSorting,
   });
 
   return (
     <div>
-      <Button onClick={() => setIsAddDialogOpen(true)} className="mb-4 inline">
-        Agregar Vehículo
-      </Button>
-      <h1>Vehículos</h1>
+      <div className="flex justify-between items-center">
+        <Button
+          onClick={() => setIsAddDialogOpen(true)}
+          className="mb-4 inline"
+        >
+          Agregar Vehículo
+        </Button>
+
+        <DownloadBtn data={data} fileName="vehicles" />
+      </div>
+      <div className="flex items-center py-4">
+        <Input
+          placeholder="Filtrar por placa"
+          value={
+            (table.getColumn("licensePlate")?.getFilterValue() as string) ?? ""
+          }
+          onChange={(event) =>
+            table.getColumn("licensePlate")?.setFilterValue(event.target.value)
+          }
+          className="max-w-sm"
+        />
+      </div>
+
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -152,8 +222,13 @@ export function VehicleList() {
           ))}
         </TableHeader>
         <TableBody>
-          {table.getRowModel().rows.map((row) => (
-            <TableRow key={row.id}>
+          {table.getRowModel().rows.map((row, i) => (
+            <TableRow
+              key={row.id}
+              className={`
+              ${i % 2 === 0 ? "bg-gray-200" : "bg-gray-100"}
+            `}
+            >
               {row.getVisibleCells().map((cell) => (
                 <TableCell key={cell.id}>
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -163,6 +238,61 @@ export function VehicleList() {
           ))}
         </TableBody>
       </Table>
+      {/* Pagination */}
+      <div className="flex items-center justify-end mt-2 gap-2">
+        <Button
+          size="sm"
+          onClick={() => {
+            table.previousPage();
+          }}
+          disabled={!table.getCanPreviousPage()}
+          // className="p-1 border boder-gray-300 px-2 disabled:opacity-30"
+        >
+          Previous
+        </Button>
+        <Button
+          size="sm"
+          onClick={() => {
+            table.nextPage();
+          }}
+          disabled={!table.getCanNextPage()}
+          // className="p-1 border boder-gray-300 px-2 disabled:opacity-30"
+        >
+          Next
+        </Button>
+        <span className="flex items-center gap-1">
+          <div>Pagina: </div>
+          <strong>
+            {table.getState().pagination.pageIndex + 1} de{" "}
+            {table.getPageCount()}
+          </strong>
+        </span>
+        <span className="flex items-center gap-1">
+          | Ir a Página:
+          <input
+            type="number"
+            defaultValue={table.getState().pagination.pageIndex + 1}
+            className="border p-1 rounded w-16 bg-transparent"
+            onChange={(e) => {
+              const page = e.target.value ? Number(e.target.value) - 1 : 0;
+              table.setPageIndex(page);
+            }}
+          />
+        </span>
+        <select
+          value={table.getState().pagination.pageSize}
+          onChange={(e) => {
+            table.setPageSize(Number(e.target.value));
+          }}
+          className="p-2 bg-transparent"
+        >
+          {[5, 10, 20, 30, 50].map((pageSize) => (
+            <option key={pageSize} value={pageSize}>
+              Mostrar {pageSize}
+            </option>
+          ))}
+        </select>
+      </div>
       <FormAddVehicle
         isOpen={isAddDialogOpen}
         setIsOpen={setIsAddDialogOpen}
