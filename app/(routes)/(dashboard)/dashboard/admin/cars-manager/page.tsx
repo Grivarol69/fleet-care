@@ -35,7 +35,7 @@ export default async function CarsManagerPage() {
           <h1 className="mb-16 text-2xl font-medium">
             Vehículos de la Empresa
           </h1>
-          <TableCars cars={car} />
+          <ListCars cars={car} />
         </div>
       </div>
     </div>

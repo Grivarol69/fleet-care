@@ -25,6 +25,23 @@ enum Status {
   INACTIVE
 }
 
+enum Type_Plate {
+  AMARILLA
+  BLANCA
+}
+
+enum Type_Situation {
+  DISPONIBLE
+  RENTADO
+  MANTENIMIENTO
+}
+
+enum Type_Owner {
+  PROPIO
+  NO_PROPIO
+  TERCERO
+}
+
 enum Engine {
   GASOLINA
   DIESEL
@@ -87,53 +104,86 @@ model Items_Plan {
 }
 
 model Vehicle_Brand {
-  id       Int       @id @default(autoincrement())
+  id       Int             @id @default(autoincrement())
   userId   String
-  name     String    @db.Text
-  status   Status    @default(ACTIVE)
-  vehicles Vehicle[]
+  name     String          @db.Text
+  status   Status          @default(ACTIVE)
+  vehicles Model_Vehicle[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Vehicle_Line {
-  id       Int       @id @default(autoincrement())
+  id       Int             @id @default(autoincrement())
   userId   String
-  name     String    @db.Text
-  status   Status    @default(ACTIVE)
-  vehicles Vehicle[]
+  name     String          @db.Text
+  status   Status          @default(ACTIVE)
+  vehicles Model_Vehicle[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Vehicle_Type {
-  id       Int       @id @default(autoincrement())
+  id       Int             @id @default(autoincrement())
   userId   String
-  name     String    @db.Text
-  status   Status    @default(ACTIVE)
-  vehicles Vehicle[]
+  name     String          @db.Text
+  status   Status          @default(ACTIVE)
+  vehicles Model_Vehicle[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model Vehicle {
+model Model_Vehicle {
   id      Int    @id @default(autoincrement())
+  userId  String
   brandId Int
   lineId  Int
   typeId  Int
   year    Int
   engine  Engine
+  wheels  Int
+  status  Status @default(ACTIVE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   brand Vehicle_Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
   line  Vehicle_Line  @relation(fields: [lineId], references: [id], onDelete: Cascade)
   type  Vehicle_Type  @relation(fields: [typeId], references: [id], onDelete: Cascade)
 
+  // Nuevo campo para la relación 1:1
+  vehicle Vehicle[]
+
+  @@index([id])
   @@index([brandId])
   @@index([lineId])
   @@index([typeId])
+}
+
+model Vehicle {
+  id             Int            @id @default(autoincrement())
+  userId         String //usuario logueado Clerk
+  modelVehicleId Int // Nuevo campo para la relación 1:1
+  photo          String         @db.Text
+  licensePlate   String         @unique //Placa identificatoria única
+  typePlate      Type_Plate //Placa Amarilla o Blanca
+  mileage        Int //kilometraje
+  color          String         @db.Text
+  owner          Type_Owner //Propio o Tercero
+  year           Int
+  status         Status         @default(ACTIVE)
+  situation      Type_Situation //Habilitado - Mantenimiento
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Nuevo campo para la relación 1:1
+  modelVehicle Model_Vehicle @relation(fields: [modelVehicleId], references: [id])
+
+  @@index([modelVehicleId])
 }
 
 model Car {

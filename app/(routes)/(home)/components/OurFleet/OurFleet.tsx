@@ -14,8 +14,8 @@ export function OurFleet() {
     <div className="max-w-6xl mx-auto text-center py-12 lg:py-40 p-6">
       <h3 className="text-2xl lg:text-6xl font-bold">Our Vehicle Fleet</h3>
       <p className="text-lg mt-2 lg:mt-5 lg:text-xl text-center w-full mx-auto max-w-2xl mb-5 lg:mb-10">
-        Don't deny yourself pleasure of driving the best premium cars from
-        around the world herre and now.
+        Dont deny yourself pleasure of driving the best premium cars from around
+        the world herre and now.
       </p>
       <div className="grid grid-cols-2 lg:grid-cols-6 gap-4 items-center justify-center mb-5 max-w-2xl mx-auto">
         {categoryOurFleet.map(({ name, active }) => (

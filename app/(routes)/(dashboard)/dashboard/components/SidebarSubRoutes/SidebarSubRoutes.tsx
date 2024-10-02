@@ -2,7 +2,8 @@
 
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@clerk/nextjs";
-import { dataGeneralSidebar, dataAdminSidebar } from "./SidebarSubRoutes.data";
+// import { dataGeneralSidebar, dataAdminSidebar } from "./SidebarSubRoutes.data";
+import { dataAdminSidebar } from "./SidebarSubRoutes.data";
 import { SidebarSubItem } from "./SidebarSubItem";
 
 export function SidebarSubRoutes() {
@@ -11,15 +12,15 @@ export function SidebarSubRoutes() {
   return (
     <div className="flex flex-col justify-between h-full">
       <div>
-        <div className="p-2 md:p-6">
+        {/* <div className="p-2 md:p-6">
           <p className="mb-2 text-sm font-semibold text-slate-500">GENERAL</p>
           {dataGeneralSidebar.map((item) => (
             <SidebarSubItem key={item.label} item={item} />
           ))}
         </div>
-        <Separator />
+        <Separator /> */}
         <div className="p-2 md:p-6">
-          <p className="mb-2 text-sm font-semibold text-slate-500">ADMIN</p>
+          <p className="mb-2 text-sm font-semibold text-slate-500">MENÚ</p>
           {dataAdminSidebar.map((item) => (
             <SidebarSubItem key={item.label} item={item} />
           ))}
