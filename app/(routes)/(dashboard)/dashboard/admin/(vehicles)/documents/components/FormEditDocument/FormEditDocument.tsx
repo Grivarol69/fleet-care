@@ -107,7 +107,21 @@ export function FormEditDocument({
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const response = await axios.post(`/api/vehicles/documents`, values);
+      const documentData = {
+        vehiclePlate: values.vehiclePlate,
+        type: values.type,
+        fileName: values.fileName,
+        fileUrl: values.fileUrl,
+        uploadDate: values.uploadDate || new Date(),
+        expiryDate: values.expiryDate || new Date(),
+        status: "VIGENTE",
+        insurance: values.insurance || "",
+      };
+
+      const response = await axios.post(
+        `/api/vehicles/documents`,
+        documentData
+      );
 
       const newDocument = response.data;
 
@@ -154,8 +168,8 @@ export function FormEditDocument({
                             ? selectedVehicle.licensePlate
                             : field.value
                         }
-                        onChange={(e) => field.onChange(Number(e.target.value))}
-                        type="string"
+                        // onChange={(e) => field.onChange(Number(e.target.value))}
+                        // type="string"
                         readOnly
                       />
                     </FormControl>
@@ -233,7 +247,7 @@ export function FormEditDocument({
                       <UploadButton
                         className="rounded-lg bg-slate-600/20 text-slate-800 outline-dotted outline-3"
                         {...field}
-                        endpoint="photo"
+                        endpoint="imageOrDocument"
                         onClientUploadComplete={(res) => {
                           form.setValue("fileUrl", res?.[0].url);
                           setPhotoUploaded(true);
@@ -326,9 +340,10 @@ export function FormEditDocument({
                       <Calendar
                         mode="single"
                         selected={field.value}
-                        onSelect={(date: Date | undefined) =>
-                          field.onChange(date)
-                        }
+                        // onSelect={(date: Date | undefined) =>
+                        //   field.onChange(date)
+                        // }
+                        onSelect={field.onChange}
                         disabled={(date) =>
                           date > new Date() || date < new Date("1900-01-01")
                         }

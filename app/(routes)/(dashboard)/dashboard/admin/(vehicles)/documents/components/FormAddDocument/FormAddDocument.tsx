@@ -38,7 +38,6 @@ import {
 
 import axios from "axios";
 import { useToast } from "@/components/hooks/use-toast";
-// import { UploadButton } from "@/app/utils/uploadthing";
 
 import { useRouter } from "next/navigation";
 import { formSchema } from "./FormAddDocument.form";
@@ -54,14 +53,11 @@ export function FormAddDocument({
   setIsOpen,
   onAddDocument,
 }: FormAddDocumentProps) {
-  const [photoUploaded, setPhotoUploaded] = useState(false);
-
   const [vehicles, setVehicles] = useState<VehicleProps[]>([]);
   const [selectedVehicle, setSelectedVehicle] = useState<VehicleProps | null>(
     null
   );
   const [isVehicleSelectOpen, setIsVehicleSelectOpen] = useState(false);
-
   const [fileUploaded, setFileUploaded] = useState<boolean>(false);
   const { startUpload } = useUploadThing("imageOrDocument");
 
@@ -108,11 +104,22 @@ export function FormAddDocument({
   };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    // Here you would typically make an API call to add the category
-    // For now, we'll just simulate it with a setTimeout
-
     try {
-      const response = await axios.post(`/api/vehicles/documents`, values);
+      const documentData = {
+        vehiclePlate: values.vehiclePlate,
+        type: values.type,
+        fileName: values.fileName,
+        fileUrl: values.fileUrl,
+        uploadDate: values.uploadDate || new Date(),
+        expiryDate: values.expiryDate || new Date(),
+        status: "VIGENTE",
+        insurance: values.insurance || "",
+      };
+
+      const response = await axios.post(
+        `/api/vehicles/documents`,
+        documentData
+      );
 
       const newDocument = response.data;
 
@@ -159,8 +166,8 @@ export function FormAddDocument({
                             ? selectedVehicle.licensePlate
                             : field.value
                         }
-                        onChange={(e) => field.onChange(Number(e.target.value))}
-                        type="string"
+                        // onChange={(e) => field.onChange(Number(e.target.value))}
+                        // type="string"
                         readOnly
                       />
                     </FormControl>
@@ -415,9 +422,10 @@ export function FormAddDocument({
                       <Calendar
                         mode="single"
                         selected={field.value}
-                        onSelect={(date: Date | undefined) =>
-                          field.onChange(date)
-                        }
+                        // onSelect={(date: Date | undefined) =>
+                        //   field.onChange(date)
+                        // }
+                        onSelect={field.onChange}
                         disabled={(date) => date < new Date("1900-01-01")}
                         initialFocus
                       />

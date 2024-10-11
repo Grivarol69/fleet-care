@@ -8,33 +8,33 @@ export async function GET() {
   try {
     const modelVehicles = await db.model_Vehicle.findMany({
       where: { status: "ACTIVE" },
-      include: {
-        brand: {
-          select: {
-            name: true,
-          },
-        },
-        line: {
-          select: {
-            name: true,
-          },
-        },
-        type: {
-          select: {
-            name: true,
-          },
-        },
-      },
+      // include: {
+      //   brand: {
+      //     select: {
+      //       name: true,
+      //     },
+      //   },
+      //   line: {
+      //     select: {
+      //       name: true,
+      //     },
+      //   },
+      //   type: {
+      //     select: {
+      //       name: true,
+      //     },
+      //   },
+      // },
     });
 
     const formattedModelVehicles = modelVehicles.map((mv) => ({
       id: mv.id,
       brandId: mv.brandId,
-      brandName: mv.brand.name,
+      // brandName: mv.brand.name,
       lineId: mv.lineId,
-      lineName: mv.line.name,
+      // lineName: mv.line.name,
       typeId: mv.typeId,
-      typeName: mv.type.name,
+      // typeName: mv.type.name,
       year: mv.year,
       engine: mv.engine,
       wheels: mv.wheels,

@@ -233,7 +233,7 @@ export function FormEditCar(props: FormEditCarProps) {
                     <UploadButton
                       className="rounded-lg bg-slate-600/20 text-slate-800 outline-dotted outline-3"
                       {...field}
-                      endpoint="photo"
+                      endpoint="imageOrDocument"
                       onClientUploadComplete={(res) => {
                         form.setValue("photo", res?.[0].url);
                         setPhotoUploaded(true);
