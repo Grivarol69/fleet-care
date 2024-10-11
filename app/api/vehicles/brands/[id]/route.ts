@@ -25,9 +25,8 @@ export async function DELETE(
 ) {
   try {
     const { id } = params;
-    await db.vehicle_Brand.update({
+    await db.vehicle_Brand.delete({
       where: { id: parseInt(id) },
-      data: { status: "INACTIVE" },
     });
     return new NextResponse(null, { status: 204 });
   } catch (error) {

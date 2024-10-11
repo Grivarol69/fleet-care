@@ -20,6 +20,18 @@ enum Mant_Type {
   INSPECCION
 }
 
+enum Document_Type {
+  SOAT
+  TECNOMECANICA
+  POLIZA
+  OTRO
+}
+
+enum Document_Status {
+  VIGENTE
+  VENCIDO
+}
+
 enum Status {
   ACTIVE
   INACTIVE
@@ -104,33 +116,30 @@ model Items_Plan {
 }
 
 model Vehicle_Brand {
-  id       Int             @id @default(autoincrement())
-  userId   String
-  name     String          @db.Text
-  status   Status          @default(ACTIVE)
-  vehicles Model_Vehicle[]
+  id      Int       @id @default(autoincrement())
+  userId  String
+  name    String    @db.Text
+  Vehicle Vehicle[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Vehicle_Line {
-  id       Int             @id @default(autoincrement())
-  userId   String
-  name     String          @db.Text
-  status   Status          @default(ACTIVE)
-  vehicles Model_Vehicle[]
+  id      Int       @id @default(autoincrement())
+  userId  String
+  name    String    @db.Text
+  Vehicle Vehicle[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Vehicle_Type {
-  id       Int             @id @default(autoincrement())
-  userId   String
-  name     String          @db.Text
-  status   Status          @default(ACTIVE)
-  vehicles Model_Vehicle[]
+  id      Int       @id @default(autoincrement())
+  userId  String
+  name    String    @db.Text
+  vehicle Vehicle[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -150,40 +159,60 @@ model Model_Vehicle {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  brand Vehicle_Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
-  line  Vehicle_Line  @relation(fields: [lineId], references: [id], onDelete: Cascade)
-  type  Vehicle_Type  @relation(fields: [typeId], references: [id], onDelete: Cascade)
-
-  // Nuevo campo para la relación 1:1
-  vehicle Vehicle[]
-
   @@index([id])
   @@index([brandId])
   @@index([lineId])
   @@index([typeId])
 }
 
+model Document {
+  id           String          @id @default(uuid())
+  userId       String
+  type         Document_Type
+  fileName     String
+  fileUrl      String
+  uploadDate   DateTime        @default(now())
+  expiryDate   DateTime?
+  status       Document_Status @default(VIGENTE)
+  insurance    String
+  vehicle      Vehicle         @relation(fields: [vehiclePlate], references: [licensePlate])
+  vehiclePlate String          @db.Text //Placa del vehiculo   
+
+  @@index([vehiclePlate, type])
+}
+
 model Vehicle {
-  id             Int            @id @default(autoincrement())
-  userId         String //usuario logueado Clerk
-  modelVehicleId Int // Nuevo campo para la relación 1:1
-  photo          String         @db.Text
-  licensePlate   String         @unique //Placa identificatoria única
-  typePlate      Type_Plate //Placa Amarilla o Blanca
-  mileage        Int //kilometraje
-  color          String         @db.Text
-  owner          Type_Owner //Propio o Tercero
-  year           Int
-  status         Status         @default(ACTIVE)
-  situation      Type_Situation //Habilitado - Mantenimiento
+  id           Int            @id @default(autoincrement())
+  userId       String //usuario logueado Clerk
+  photo        String         @db.Text
+  licensePlate String         @unique //Placa identificatoria única
+  typePlate    Type_Plate //Placa Amarilla o Blanca
+  brandId      Int            @default(1) //Marca
+  lineId       Int            @default(1) //Linea
+  typeId       Int            @default(1) //Tipo
+  mileage      Int            @default(0) //kilometraje
+  cylinder     Int            @default(0) //cilindrada
+  bodyWork     String?        @db.Text //Carrocería
+  engineNumber String?        @db.Text //Número motor
+  chasisNumber String?        @db.Text //Número Chasis
+  ownerCard    String?        @db.Text //Número tarjeta propiedad
+  color        String         @db.Text
+  owner        Type_Owner //Propio o Tercero
+  year         Int
+  status       Status         @default(ACTIVE)
+  situation    Type_Situation //Habilitado - Mantenimiento
+  documents    Document[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Nuevo campo para la relación 1:1
-  modelVehicle Model_Vehicle @relation(fields: [modelVehicleId], references: [id])
+  brand Vehicle_Brand @relation(fields: [brandId], references: [id])
+  line  Vehicle_Line  @relation(fields: [lineId], references: [id])
+  type  Vehicle_Type  @relation(fields: [typeId], references: [id])
 
-  @@index([modelVehicleId])
+  @@index([brandId])
+  @@index([lineId])
+  @@index([typeId])
 }
 
 model Car {

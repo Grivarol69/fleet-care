@@ -4,9 +4,7 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const brands = await db.vehicle_Brand.findMany({
-      where: { status: "ACTIVE" },
-    });
+    const brands = await db.vehicle_Brand.findMany();
     return NextResponse.json(brands);
   } catch (error) {
     console.error("[BRANDS_GET]", error);
@@ -27,7 +25,6 @@ export async function POST(req: Request) {
       data: {
         userId,
         name,
-        status: "ACTIVE", // Asegúrate de establecer el estado inicial
       },
     });
 

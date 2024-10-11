@@ -47,11 +47,8 @@ export const dataAdminSidebar = [
       { label: "Marcas", href: "/dashboard/admin/brands" },
       { label: "Tipos", href: "/dashboard/admin/types" },
       { label: "Líneas", href: "/dashboard/admin/lines" },
-      {
-        label: "Modelos de Vehículos",
-        href: "/dashboard/admin/model-vehicles",
-      },
       { label: "Vehiculos de la Empresa", href: "/dashboard/admin/vehicles" },
+      { label: "Documentos Obligatorios", href: "/dashboard/admin/documents" },
     ],
   },
   {

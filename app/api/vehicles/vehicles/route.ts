@@ -9,23 +9,19 @@ export async function GET() {
     const vehicles = await db.vehicle.findMany({
       where: { status: "ACTIVE" },
       include: {
-        modelVehicle: {
-          include: {
-            brand: {
-              select: {
-                name: true,
-              },
-            },
-            line: {
-              select: {
-                name: true,
-              },
-            },
-            type: {
-              select: {
-                name: true,
-              },
-            },
+        brand: {
+          select: {
+            name: true,
+          },
+        },
+        line: {
+          select: {
+            name: true,
+          },
+        },
+        type: {
+          select: {
+            name: true,
           },
         },
       },
@@ -34,22 +30,15 @@ export async function GET() {
     const formattedVehicles = vehicles.map((vehicle) => ({
       id: vehicle.id,
       photo: vehicle.photo,
-      modelVehicleId: vehicle.modelVehicleId,
       licensePlate: vehicle.licensePlate,
-      brandName: vehicle.modelVehicle.brand.name,
-      lineName: vehicle.modelVehicle.line.name,
-      typeName: vehicle.modelVehicle.type.name,
-      modelVehicle: {
-        brand: {
-          name: vehicle.modelVehicle.brand.name,
-        },
-        line: {
-          name: vehicle.modelVehicle.line.name,
-        },
-        type: {
-          name: vehicle.modelVehicle.type.name,
-        },
-      },
+      brandName: vehicle.brand.name,
+      lineName: vehicle.line.name,
+      typeName: vehicle.type.name,
+      cylinder: vehicle.cylinder,
+      bodyWork: vehicle.bodyWork,
+      engineNumber: vehicle.engineNumber,
+      chasisNumber: vehicle.chasisNumber,
+      ownerCard: vehicle.ownerCard,
       typePlate: vehicle.typePlate,
       mileage: vehicle.mileage,
       color: vehicle.color,
@@ -72,32 +61,33 @@ export async function POST(req: Request) {
     const data = await req.json();
     console.log(data);
 
-    const { modelVehicleId, id, ...otherData } = data;
+    const { id, ...otherData } = data;
 
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    // Primero verificamos si el Model_Vehicle existe
-    const existingModelVehicle = await db.model_Vehicle.findUnique({
-      where: { id: modelVehicleId },
-    });
+    // // Primero verificamos si el Model_Vehicle existe
+    // const existingModelVehicle = await db.model_Vehicle.findUnique({
+    //   where: { id: modelVehicleId },
+    // });
 
-    if (!existingModelVehicle) {
-      return new NextResponse("Model Vehicle Not Found", { status: 404 });
-    }
+    // if (!existingModelVehicle) {
+    //   return new NextResponse("Model Vehicle Not Found", { status: 404 });
+    // }
+
     const vehicle = await db.vehicle.create({
       data: {
         userId,
         status: "ACTIVE",
-        modelVehicle: {
-          connect: { id: modelVehicleId }, // Aquí se conecta con un Model_Vehicle existente por su ID
-        },
+        // modelVehicle: {
+        //   connect: { id: modelVehicleId }, // Aquí se conecta con un Model_Vehicle existente por su ID
+        // },
         ...otherData,
       },
-      include: {
-        modelVehicle: true,
-      },
+      // include: {
+      //   modelVehicle: true,
+      // },
     });
 
     return NextResponse.json(vehicle);

@@ -4,9 +4,7 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const lines = await db.vehicle_Line.findMany({
-      where: { status: "ACTIVE" },
-    });
+    const lines = await db.vehicle_Line.findMany();
     return NextResponse.json(lines);
   } catch (error) {
     console.error("[LINE_GET]", error);
@@ -27,7 +25,6 @@ export async function POST(req: Request) {
       data: {
         userId,
         name,
-        status: "ACTIVE", // Asegúrate de establecer el estado inicial
       },
     });
 

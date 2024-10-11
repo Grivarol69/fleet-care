@@ -26,17 +26,19 @@ import { FormAddVehicle } from "../FormAddVehicles";
 import { FormEditVehicle } from "../FormEditVehicles";
 import axios from "axios";
 import { useToast } from "@/components/hooks/use-toast";
-import { VehicleListProps } from "./VehiclesList.types";
+import { VehicleListProps, VehicleEditProps } from "./VehiclesList.types";
 import Image from "next/image";
 import { DownloadBtn } from "./DownloadBtn";
 import { Input } from "@/components/ui/input";
 import { ArrowUpDown } from "lucide-react";
+import { FormAddVehicleDocuments } from "../FormAddVehiclesDoc";
+import { FormEditVehicleDocument } from "../FormEditVehiclesDoc";
 
 export function VehicleList() {
   const [data, setData] = useState<VehicleListProps[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [editingVehicle, setEditingVehicle] = useState<VehicleListProps | null>(
+  const [editingVehicle, setEditingVehicle] = useState<VehicleEditProps | null>(
     null
   );
   const [globalFilter, setGlobalFilter] = useState("");
@@ -64,7 +66,6 @@ export function VehicleList() {
   }, []);
 
   const handleEdit = (vehicle: VehicleListProps) => {
-    console.log(vehicle);
     setEditingVehicle(vehicle);
     setIsEditDialogOpen(true);
   };
@@ -137,6 +138,11 @@ export function VehicleList() {
       { accessorKey: "lineName", header: "Linea" },
       { accessorKey: "typeName", header: "Tipo" },
       { accessorKey: "typePlate", header: "Tipo Placa" },
+      { accessorKey: "cylinder", header: "Cilindraje" },
+      { accessorKey: "bodyWork", header: "Carrocería" },
+      { accessorKey: "engineNumber", header: "Nro Motor" },
+      { accessorKey: "chasisNumber", header: "Nro Chasis" },
+      { accessorKey: "ownerCard", header: "Tarjeta Propietario" },
       { accessorKey: "mileage", header: "KM" },
       { accessorKey: "color", header: "Color" },
       { accessorKey: "owner", header: "Propietario" },
@@ -293,17 +299,16 @@ export function VehicleList() {
           ))}
         </select>
       </div>
-      <FormAddVehicle
+      <FormAddVehicleDocuments
         isOpen={isAddDialogOpen}
         setIsOpen={setIsAddDialogOpen}
-        // onAddVehicle={handleAddVehicle}
-        onAddVehicle={(newVehicle) => {
-          setData([...data, newVehicle]);
+        onAddVehicle={(vehicle) => {
+          setData([...data, vehicle]);
           fetchVehicles();
         }}
       />
       {editingVehicle && (
-        <FormEditVehicle
+        <FormEditVehicleDocument
           isOpen={isEditDialogOpen}
           setIsOpen={setIsEditDialogOpen}
           vehicle={editingVehicle}

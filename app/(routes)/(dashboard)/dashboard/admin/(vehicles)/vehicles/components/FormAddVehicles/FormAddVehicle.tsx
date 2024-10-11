@@ -28,33 +28,64 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { UploadButton } from "@/app/utils/uploadthing";
+// import { UploadButton } from "@/app/utils/uploadthing";
 import axios from "axios";
 import { useToast } from "@/components/hooks/use-toast";
 
 import { useRouter } from "next/navigation";
 import { formSchema } from "./FormAddVehicles.form";
 import { ModelSelectModal } from "../ModelSelectModal";
-import { FormAddVehicleProps, ModelVehicle } from "./FormAddVehicles.types";
+import { FormAddVehicleProps } from "./FormAddVehicles.types";
+import { useUploadThing } from "@/app/utils/uploadthing";
+
+type VehicleBrand = {
+  id: number;
+  name: string;
+};
+
+type VehicleLine = {
+  id: number;
+  name: string;
+};
+
+type VehicleType = {
+  id: number;
+  name: string;
+};
 
 export function FormAddVehicle({
   isOpen,
   setIsOpen,
   onAddVehicle,
 }: FormAddVehicleProps) {
-  const [vehicleModels, setVehicleModels] = useState<ModelVehicle[]>([]);
+  // const [vehicleModels, setVehicleModels] = useState<ModelVehicle[]>([]);
+  // const [selectedModel, setSelectedModel] = useState<ModelVehicle | null>(null);
+
   const [isModelSelectOpen, setIsModelSelectOpen] = useState(false);
-  const [selectedModel, setSelectedModel] = useState<ModelVehicle | null>(null);
   const [photoUploaded, setPhotoUploaded] = useState(false);
+
+  const [vehicleBrands, setVehicleBrands] = useState<VehicleBrand[]>([]);
+  const [vehicleLines, setVehicleLines] = useState<VehicleLine[]>([]);
+  const [vehicleTypes, setVehicleTypes] = useState<VehicleType[]>([]);
+
+  const [fileUploaded, setFileUploaded] = useState<boolean>(false);
+  const { startUpload } = useUploadThing("imageOrDocument");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      modelVehicleId: 0,
       photo: "",
       licensePlate: "",
       typePlate: "",
+      brandId: 0,
+      lineId: 0,
+      typeId: 0,
       mileage: 0,
+      cylinder: 0,
+      bodyWork: "",
+      engineNumber: "",
+      chasisNumber: "",
+      ownerCard: "",
       color: "",
       owner: "",
       year: 0,
@@ -65,49 +96,98 @@ export function FormAddVehicle({
   const router = useRouter();
   const { toast } = useToast();
 
-  //* Traemos los modelos para forzar el lookup de Modelos
+  // //* Traemos los modelos para forzar el lookup de Modelos
+
+  // useEffect(() => {
+  //   const fetchModelVehicles = async () => {
+  //     try {
+  //       const response = await axios.get("/api/vehicles/model-vehicles");
+  //       setVehicleModels(response.data);
+  //     } catch (error) {
+  //       console.error("Error fetching model vehicles:", error);
+  //       toast({
+  //         title: "Error fetching model vehicles",
+  //         description: "Please try again later",
+  //         variant: "destructive",
+  //       });
+  //     }
+  //   };
+
+  //   fetchModelVehicles();
+  // }, [toast]);
+
+  // const handleModelSelect = (model: ModelVehicle) => {
+  //   setSelectedModel(model);
+  //   form.setValue("modelVehicleId", model.id);
+  //   setIsModelSelectOpen(false);
+  // };
+
+  //* fetch Brands of Vehicles from Database
 
   useEffect(() => {
-    const fetchModelVehicles = async () => {
+    const fetchingBrands = async () => {
       try {
-        const response = await axios.get("/api/vehicles/model-vehicles");
-        setVehicleModels(response.data);
+        const response = await axios.get(`/api/vehicles/brands`);
+        setVehicleBrands(response.data);
       } catch (error) {
-        console.error("Error fetching model vehicles:", error);
-        toast({
-          title: "Error fetching model vehicles",
-          description: "Please try again later",
-          variant: "destructive",
-        });
+        console.log("Error al cargar las marcas de vehículos", error);
       }
     };
 
-    fetchModelVehicles();
-  }, [toast]);
+    fetchingBrands();
+  }, []);
 
-  const handleModelSelect = (model: ModelVehicle) => {
-    setSelectedModel(model);
-    form.setValue("modelVehicleId", model.id);
-    setIsModelSelectOpen(false);
-  };
+  //* fetch Lines of Vehicles from Database
+
+  useEffect(() => {
+    const fetchingLines = async () => {
+      try {
+        const response = await axios.get(`/api/vehicles/lines`);
+        setVehicleLines(response.data);
+      } catch (error) {
+        console.log("Error al cargar las lineas", error);
+      }
+    };
+
+    fetchingLines();
+  }, []);
+
+  //* fetch Types of Vehicles from Database
+
+  useEffect(() => {
+    const fetchingTypes = async () => {
+      try {
+        const response = await axios.get(`/api/vehicles/types`);
+        setVehicleTypes(response.data);
+      } catch (error) {
+        console.log("Error al cargar los tipos de vehículos", error);
+      }
+    };
+
+    fetchingTypes();
+  }, []);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(values);
     try {
       const formattedValues = {
         ...values,
-        modelVehicleId: Number(values.modelVehicleId),
         photo: String(values.photo),
         licensePlate: String(values.licensePlate).toUpperCase(),
         typePlate: String(values.typePlate),
+        brandId: Number(values.brandId),
+        lineId: Number(values.lineId),
+        typeId: Number(values.typeId),
         mileage: Number(values.mileage),
+        cylinder: Number(values.cylinder),
+        bodyWork: String(values.bodyWork),
+        engineNumber: String(values.engineNumber),
+        chasisNumber: String(values.chasisNumber),
+        ownerCard: String(values.ownerCard),
         color: String(values.color).toUpperCase(),
         owner: String(values.owner),
         year: Number(values.year),
         situation: String(values.situation),
       };
-
-      console.log("Valores formateados", formattedValues);
 
       const response = await axios.post(
         `/api/vehicles/vehicles`,
@@ -143,8 +223,8 @@ export function FormAddVehicle({
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            {/* ------------ Carga de Modelos ---------------*/}
-
+            {/* ------------ Carga de Modelos --------------- */}
+            {/*
             <FormField
               control={form.control}
               name="modelVehicleId"
@@ -173,6 +253,7 @@ export function FormAddVehicle({
                 </FormItem>
               )}
             />
+            */}
 
             <div className="grid gap-6 lg:grid-cols-2">
               {/* --------- Placa Vehículo -------------*/}
@@ -218,6 +299,99 @@ export function FormAddVehicle({
                 )}
               />
 
+              {/* ------------ Carga de Marcas ---------------*/}
+
+              <FormField
+                control={form.control}
+                name="brandId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Marca de Vehículo</FormLabel>
+                    <Select
+                      onValueChange={(value) => field.onChange(Number(value))}
+                      value={field.value?.toString() || ""}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccione una marca" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {vehicleBrands.map((brand) => (
+                          <SelectItem
+                            key={brand.id}
+                            value={brand.id.toString()}
+                          >
+                            {brand.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* ------------ Carga de Lineas ---------------*/}
+
+              <FormField
+                control={form.control}
+                name="lineId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Linea de Vehículo</FormLabel>
+                    <Select
+                      onValueChange={(value) => field.onChange(Number(value))}
+                      value={field.value?.toString() || ""}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccione una Linea" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {vehicleLines.map((line) => (
+                          <SelectItem key={line.id} value={line.id.toString()}>
+                            {line.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* ------------ Carga de Types ---------------*/}
+
+              <FormField
+                control={form.control}
+                name="typeId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tipos de Vehículo</FormLabel>
+                    <Select
+                      onValueChange={(value) => field.onChange(Number(value))}
+                      value={field.value?.toString() || ""}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccione un Tipo" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {vehicleTypes.map((type) => (
+                          <SelectItem key={type.id} value={type.id.toString()}>
+                            {type.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               {/* --------------- kILOMETRAJE ------------------- */}
 
               <FormField
@@ -233,6 +407,90 @@ export function FormAddVehicle({
                         {...field}
                         onChange={(e) => field.onChange(Number(e.target.value))}
                       />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* --------- Cilindraje -------------*/}
+
+              <FormField
+                control={form.control}
+                name="cylinder"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Cilindraje</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Cilindraje Motor"
+                        {...field}
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* --------- Carroceria -------------*/}
+
+              <FormField
+                control={form.control}
+                name="bodyWork"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Carrocería</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Carrocería" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* --------- Número Motor -------------*/}
+
+              <FormField
+                control={form.control}
+                name="engineNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Número Motor</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Número Motor" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* --------- Número Chasis -------------*/}
+
+              <FormField
+                control={form.control}
+                name="chasisNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Número Chasis</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Número Chasis" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* --------- Tarjeta Propietario -------------*/}
+
+              <FormField
+                control={form.control}
+                name="ownerCard"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tarjeta Propietario</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Tarjeta Propietario" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -340,7 +598,7 @@ export function FormAddVehicle({
 
               {/* ------------ Fotografía ---------------*/}
 
-              <FormField
+              {/* <FormField
                 control={form.control}
                 name="photo"
                 render={({ field }) => (
@@ -353,7 +611,7 @@ export function FormAddVehicle({
                         <UploadButton
                           className="rounded-lg bg-slate-600/20 text-slate-800 outline-dotted outline-3"
                           {...field}
-                          endpoint="photo"
+                          endpoint="imageOrDocument"
                           onClientUploadComplete={(res) => {
                             form.setValue("photo", res?.[0].url);
                             setPhotoUploaded(true);
@@ -367,18 +625,54 @@ export function FormAddVehicle({
                     <FormMessage />
                   </FormItem>
                 )}
+              /> */}
+
+              <FormField
+                control={form.control}
+                name="photo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Imagen</FormLabel>
+                    <FormControl>
+                      {fileUploaded ? (
+                        <h3 className="text-sm">Archivo subido!</h3>
+                      ) : (
+                        <Input
+                          className="rounded-lg bg-slate-600/20 text-slate-800 outline-dotted outline-3"
+                          type="file"
+                          accept=".pdf,image/*"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              try {
+                                const uploadedFiles = await startUpload([file]);
+                                if (uploadedFiles && uploadedFiles[0]) {
+                                  field.onChange(uploadedFiles[0].url);
+                                  setFileUploaded(true);
+                                }
+                              } catch (error) {
+                                console.error("Error uploading file:", error);
+                              }
+                            }
+                          }}
+                        />
+                      )}
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
             </div>
             <Button type="submit">Crear Modelo</Button>
           </form>
         </Form>
       </DialogContent>
-      <ModelSelectModal
+      {/* <ModelSelectModal
         isOpen={isModelSelectOpen}
         setIsOpen={setIsModelSelectOpen}
         models={vehicleModels}
         onSelectModel={handleModelSelect}
-      />
+      /> */}
     </Dialog>
   );
 }
