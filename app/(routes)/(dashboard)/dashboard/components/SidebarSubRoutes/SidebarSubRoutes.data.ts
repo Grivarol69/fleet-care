@@ -24,7 +24,7 @@ export const dataAdminSidebar = [
   {
     icon: LayoutDashboard,
     label: "Dashboard",
-    href: "/",
+    href: "/dashboard",
   },
   {
     icon: Building2,
@@ -43,12 +43,12 @@ export const dataAdminSidebar = [
     icon: Truck,
     label: "Vehículos",
     subItems: [
-      { label: "Listado", href: "/dashboard/admin/cars-manager" },
-      { label: "Marcas", href: "/dashboard/admin/brands" },
-      { label: "Tipos", href: "/dashboard/admin/types" },
-      { label: "Líneas", href: "/dashboard/admin/lines" },
-      { label: "Vehiculos de la Empresa", href: "/dashboard/admin/vehicles" },
-      { label: "Documentos Obligatorios", href: "/dashboard/admin/documents" },
+      { label: "Listado Vehículos", href: "/vehicles/fleet" },
+      { label: "Marcas", href: "/vehicles/brands" },
+      { label: "Líneas", href: "/vehicles/lines" },
+      { label: "Tipos", href: "/vehicles/types" },
+      { label: "Vehiculos de la Empresa", href: "/vehicles/vehicles" },
+      { label: "Documentos Obligatorios", href: "/vehicles/documents" },
     ],
   },
   {
@@ -56,11 +56,17 @@ export const dataAdminSidebar = [
     label: "Mantenimiento",
 
     subItems: [
-      { label: "Paquetes", href: "/dashboard/admin/maintenance/paquetes" },
-      { label: "Tareas", href: "/dashboard/admin/maintenance/tareas" },
-      { label: "Ítems", href: "/dashboard/admin/maintenance/items" },
-      { label: "Programar", href: "/dashboard/admin/maintenance/programar" },
-      { label: "Historial", href: "/dashboard/admin/maintenance/historial" },
+      { label: "Categorias", href: "/mantenaince/mant-categories" },
+      { label: "Items", href: "/mantenaince/mant-items" },
+      { label: "Planes", href: "/mantenaince/mant-plan" },
+      { label: "Tareas", href: "/mantenaince/plan-tasks" },
+      { label: "Vehiculos-Plan", href: "/mantenaince/plan-vehicles" },
+      { label: "Ordenes de Trabajo", href: "/mantenaince/work-orders" },
+      {
+        label: "Tareas Orden de Trabajo",
+        href: "/mantenaince/items-workorders",
+      },
+      { label: "Items-Proveedores", href: "/people/mant-item-provider" },
     ],
   },
   {
@@ -79,7 +85,7 @@ export const dataAdminSidebar = [
     icon: Users,
     label: "Personal",
     subItems: [
-      { label: "Mecánicos", href: "/personal/mecanicos" },
+      { label: "Mecánicos", href: "/people/technicians" },
       { label: "Conductores", href: "/personal/conductores" },
       { label: "Agregar", href: "/personal/agregar" },
     ],
@@ -89,7 +95,7 @@ export const dataAdminSidebar = [
     label: "Proveedores",
     subItems: [
       { label: "Listado", href: "/proveedores/listado" },
-      { label: "Agregar", href: "/proveedores/agregar" },
+      { label: "Agregar", href: "/people/providers" },
       { label: "Categorías", href: "/proveedores/categorias" },
     ],
   },
@@ -108,6 +114,17 @@ export const dataAdminSidebar = [
   {
     icon: Settings,
     label: "Configuración",
-    href: "/configuracion",
+    subItems: [
+      { label: "Tenant", href: "/admin/tenant" },
+      { label: "User", href: "/admin/user" },
+      { label: "Role", href: "/admin/role" },
+      { label: "Permission", href: "/admin/permission" },
+      { label: "Role-Permission", href: "/admin/role-permission" },
+      { label: "Estado Flota", href: "/reportes/estado-flota" },
+      {
+        label: "Eficiencia",
+        href: "/reportes/eficiencia-mantenimiento",
+      },
+    ],
   },
 ];

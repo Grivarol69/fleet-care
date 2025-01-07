@@ -4,40 +4,59 @@
   - sign-in // Ruta: http://localhost:3000/sign-in
   - sign-up // Ruta: http://localhost:3000/sign-up
 - (routes)
+  - (admin)
+    - admin
+      - (multitenant)
+        - permission
+        - role
+        - role-permission
+        - tenant
+        - user
+      - (template)
+        - permission-template
+        - role-permission-template
+        - role-template
+        - tenant-template
   - (dashboard)
     - dashboard
-      - admin
-        - cars-manager
-          - page.tsx // Ruta: http://localhost:3000/dashboard/admin/cars-manager
-          - layout.tsx **LayoutAdminCarsManager**
-          - components
-            - ButtonAddCar
-              - Funcionalidad Dialog
-            - FormAddCar
-              - FormAddCar.tsx **formulario**
-              - FormAddCar.form.ts **data validada con Zod**
-            - ListCars **Listado de Coches**
-              - ListCars.types.ts
-              - ListCars.jsx
-            - TableCars
-              - TableCars.types.ts
-              - TableCars.tsx
       - components
-        - Sidebar
-          - Sidebar.tsx
+        - Listcars
         - LogoDashboard
-          - LogoDashboard.tsx
         - NavbarDashboard
-          - NavbarDashboard.tsx
+        - Sidebar
         - SidebarRoutes
-          - SidebarRoutes.data.ts **contiene los items del menu de la sidebar**
-          - SidebarRoutes.tsx **contenedor de items**
-            - SidebarItem
-              - SidebarItem.tsx
-              - SidebarItem.types.ts **contiene los tipos de la Props**
-      - page.tsx - **DashboardPage**
-    - DashboardLayout - aca se define el **sidebar** y el **navbar**
+        - SidebarSub
+        - SidebarSubRoutes
+          - SidebarSubItem
+        - page.tsx
+    - layout.tsx
   - (home)
-  - page.tsx \*\*Página Principal
+    - components
+      - DriveToday
+      - Features
+      - FirstBlock
+      - Ourfleet
+      - SliderBrands
+    - page.tsx
+  - (mantenaince)
+    - (checklist)
+    - (mantenaince)
+      - category
+      - item-routine
+      - mant-item
+      - mant-routine
+      -
+    - (reports)
+    - (vehicles)
+      - brands
+      - documents
+      - lines
+      - model-vehicles
+      - types
+      - vehicles
+  - (people)
+    - people
+      - providers
+      - technicians
 - api
   - car **/api/car Endpoint donde se envia la data obtenida en el form para que guarde en la DB**

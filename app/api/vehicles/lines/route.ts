@@ -4,7 +4,15 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const lines = await db.vehicle_Line.findMany();
+    const lines = await db.vehicle_Line.findMany({
+      include: {
+        brand: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
     return NextResponse.json(lines);
   } catch (error) {
     console.error("[LINE_GET]", error);
@@ -15,7 +23,7 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const { userId } = auth();
-    const { name } = await req.json();
+    const { name, brandId } = await req.json();
 
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -25,6 +33,7 @@ export async function POST(req: Request) {
       data: {
         userId,
         name,
+        brandId,
       },
     });
 

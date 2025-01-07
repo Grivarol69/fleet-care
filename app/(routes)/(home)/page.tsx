@@ -8,12 +8,12 @@ import SliderBrands from "./components/SliderBrands/SliderBrands";
 export default function Home() {
   return (
     <div>
-      <Navbar />
+      {/* <Navbar /> */}
       <FirstBlock />
       <SliderBrands />
-      <Features />
+      {/* <Features />
       <OurFleet />
-      <DriveToday />
+      <DriveToday /> */}
     </div>
   );
 }

@@ -8,22 +8,11 @@ export async function GET() {
   try {
     const vehicles = await db.vehicle.findMany({
       where: { status: "ACTIVE" },
+      //
       include: {
-        brand: {
-          select: {
-            name: true,
-          },
-        },
-        line: {
-          select: {
-            name: true,
-          },
-        },
-        type: {
-          select: {
-            name: true,
-          },
-        },
+        brand: true, // Incluir todo el objeto brand
+        line: true, // Incluir todo el objeto line
+        type: true, // Incluir todo el objeto type
       },
     });
 
@@ -31,6 +20,9 @@ export async function GET() {
       id: vehicle.id,
       photo: vehicle.photo,
       licensePlate: vehicle.licensePlate,
+      brandId: vehicle.brandId,
+      lineId: vehicle.lineId,
+      typeId: vehicle.typeId,
       brandName: vehicle.brand.name,
       lineName: vehicle.line.name,
       typeName: vehicle.type.name,
@@ -67,27 +59,13 @@ export async function POST(req: Request) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    // // Primero verificamos si el Model_Vehicle existe
-    // const existingModelVehicle = await db.model_Vehicle.findUnique({
-    //   where: { id: modelVehicleId },
-    // });
-
-    // if (!existingModelVehicle) {
-    //   return new NextResponse("Model Vehicle Not Found", { status: 404 });
-    // }
-
     const vehicle = await db.vehicle.create({
       data: {
         userId,
         status: "ACTIVE",
-        // modelVehicle: {
-        //   connect: { id: modelVehicleId }, // Aquí se conecta con un Model_Vehicle existente por su ID
-        // },
+
         ...otherData,
       },
-      // include: {
-      //   modelVehicle: true,
-      // },
     });
 
     return NextResponse.json(vehicle);

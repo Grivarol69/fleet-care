@@ -18,7 +18,7 @@ export function Navbar() {
           <span className="text-xl font-bold">Fleet-Care</span>
         </Link>
         <div className="flex items-center justify-center gap-x-7">
-          <Link href="/dashboard/admin/vehicles" className="text-1xl">
+          <Link href="/vehicles/fleet" className="text-1xl">
             Lista de Vehículos
           </Link>
           <Link href="/dashboard" className="text-1xl">

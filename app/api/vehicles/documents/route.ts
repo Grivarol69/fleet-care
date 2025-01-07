@@ -19,6 +19,7 @@ export async function POST(req: Request) {
     const { userId } = auth();
     const {
       type,
+      tenantId,
       fileName,
       fileUrl,
       uploadDate,
@@ -35,6 +36,7 @@ export async function POST(req: Request) {
     const document = await db.document.create({
       data: {
         userId,
+        tenantId,
         type,
         fileName,
         fileUrl,
@@ -43,6 +45,11 @@ export async function POST(req: Request) {
         status,
         insurance,
         vehiclePlate,
+        // vehicle: {
+        //   connect: {
+        //     licensePlate: vehiclePlate,
+        //   },
+        // },
       },
     });
 
